@@ -67,7 +67,6 @@ graph TB
 
     API --> DOCKER[Docker Image]
     DOCKER --> K8S[Kubernetes Deployment<br/>2 replicas + Service]
-    DOCKER --> CI[GitHub Actions CI]
 ```
 
 ---
@@ -196,7 +195,6 @@ Interactive Swagger docs are available at `/docs` once the service is running.
 
 - **Containerization**: a purpose-built Docker image (`Dockerfile`) includes only the API's actual runtime dependencies (`requirements-api.txt`) — heavier training-only dependencies like PyTorch are deliberately excluded from the serving image, keeping it lean and fast to build.
 - **Orchestration**: `k8s/deployment.yaml` and `k8s/service.yaml` deploy the API as a 2-replica Kubernetes Deployment with liveness/readiness probes against `/health`, fronted by a NodePort Service — verified against a local minikube cluster running on the Docker driver.
-- **CI**: GitHub Actions (`.github/workflows/`) runs the test suite and validates the Docker build on every push.
 
 ---
 
@@ -215,29 +213,30 @@ Interactive Swagger docs are available at `/docs` once the service is running.
 | Notebooks | Jupyter, nbformat |
 | Containerization | Docker |
 | Orchestration | Kubernetes (minikube) |
-| CI/CD | GitHub Actions |
 | Version Control | Git / GitHub |
 
 ---
 
 ## Project Structure
 
+```
 financial-ai-system/
 ├── src/
-│ ├── fraud/ # System 1: baseline, ensemble, graph, GNN, explainability
-│ ├── quant/ # System 2: PINN, sequence models, Heston, factor model,
-│ │ # portfolio optimization, risk, backtesting
-│ ├── shared/ # Generalized anomaly-scoring & graph utilities used by System 1
-│ ├── api/ # FastAPI application and route definitions
-│ └── monitoring/ # Observability hooks
-├── k8s/ # Kubernetes Deployment + Service manifests
-├── monitoring/grafana/ # Dashboards (Prometheus/Grafana)
-├── notebooks/ # Full mathematical derivations
-├── tests/ # Test suite
-├── docs/assets/ # README figures
+│   ├── fraud/           # System 1: baseline, ensemble, graph, GNN, explainability
+│   ├── quant/            # System 2: PINN, sequence models, Heston, factor model,
+│   │                     # portfolio optimization, risk, backtesting
+│   ├── shared/            # Generalized anomaly-scoring & graph utilities used by System 1
+│   ├── api/                # FastAPI application and route definitions
+│   ├── agents/              # Reserved for future agentic orchestration (not yet implemented)
+│   └── monitoring/           # Reserved for observability hooks (not yet implemented)
+├── k8s/                       # Kubernetes Deployment + Service manifests
+├── notebooks/                  # Full mathematical derivations
+├── tests/                       # Test package scaffold (no tests implemented yet)
+├── docs/assets/                  # README figures
 ├── Dockerfile
-├── requirements.txt # Full research/training environment
-└── requirements-api.txt # Minimal serving environment
+├── requirements.txt              # Full research/training environment
+└── requirements-api.txt          # Minimal serving environment
+```
 
 ---
 
@@ -263,6 +262,15 @@ minikube start --driver=docker
 minikube image load financial-ai-api:latest
 kubectl apply -f k8s/
 ```
+
+---
+
+## Roadmap
+
+- Add an automated test suite (`tests/` currently ships as an empty package)
+- Add a GitHub Actions CI workflow to run tests and validate the Docker build on every push
+- Wire up Prometheus/Grafana observability (`src/monitoring/` is currently a placeholder)
+- Add fraud-scoring API endpoints once trained-model checkpoint persistence is in place
 
 ---
 
